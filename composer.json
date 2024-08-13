@@ -1,0 +1,43 @@
+{
+    "name": "cbd/rlm",
+    "description": "RLM Licence Manager",
+    "type": "craft-plugin",
+    "version": "0.0.3",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "rlm"
+    ],
+    "support": {
+        "docs": "coffeebean.design",
+        "issues": "coffeebean.design"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Coffee Bean Design",
+            "homepage": "coffeebean.design"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1"
+    },
+    "autoload": {
+        "psr-4": {
+          "cbd\\rlm\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "RLM Licence Manager",
+        "handle": "rlm",
+        "hasCpSettings": true,
+        "hasCpSection": true,
+        "changelogUrl": "coffeebean.design",
+        "components": {
+            "rlmService": "cbd\\rlm\\services\\RlmService"
+        },
+        "class": "cbd\\rlm\\Rlm"
+    }
+}

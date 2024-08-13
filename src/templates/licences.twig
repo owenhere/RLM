@@ -1,0 +1,12 @@
+{% extends '_layouts/elementindex' %}
+{% set tabs = {
+    index: {label: 'Licence Types'|t, url: url('rlm') },
+    licences: {label: 'Imported Licences'|t, url: url('rlm/licences') },
+} %}
+{% set selectedTab = 'licences' %}
+{% set title = 'RLM Licence Manager' %}
+{% set elementType = 'cbd\\rlm\\elements\\RlmLicence' %}
+
+{% block actionButton %}
+    <a class="btn submit add icon" href="{{ url('rlm/licences/import') }}">{{ "Import licences" }}</a>
+{% endblock %}

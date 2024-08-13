@@ -1,0 +1,94 @@
+{% extends 'rlm/_layouts/cp' %}
+{% import "_includes/forms" as forms %}
+{% set title = 'RLM Licence Manager - Licence Type'|t %}
+
+{% set fullPageForm = true %}
+{% set saveShortcutRedirect = continueEditingUrl %}
+
+{% set isNewType = rlmLicenceType.id ? false : true %}
+
+{% block actionButton %}
+    <div class="btngroup">
+        <input type="submit" class="btn submit" value="{{ 'Save'|t('app') }}">
+    </div>
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" name="action" value="rlm/cp/save-type">
+    {{ redirectInput('rlm') }}
+    {% if rlmLicenceType.id %}<input type="hidden" name="rlmLicenceTypeId" value="{{ rlmLicenceType.id }}">{% endif %}
+    <div id="fields">
+        {{ forms.textField({
+            label: "Title"|t('app'),
+            siteId: rlmLicenceType.siteId,
+            id: 'title',
+            name: 'title',
+            value: rlmLicenceType.title,
+            errors: rlmLicenceType.getErrors('title'),
+            first: true,
+            autofocus: true,
+            required: true,
+            maxlength: 255
+        }) }}
+        {{ forms.select({
+            label: "Duration",
+            siteId: rlmLicenceType.siteId,
+            id: 'duration',
+            name: 'duration',
+            value: rlmLicenceType.duration,
+            errors: rlmLicenceType.getErrors('duration'),
+            required: true,
+            options: {trial: 'Trial', rental: 'Rental', permanent: 'Permanent'}
+        }) }}
+        {{ forms.select({
+            label: "Usage",
+            siteId: rlmLicenceType.siteId,
+            id: 'usage',
+            name: 'usage',
+            value: rlmLicenceType.usage,
+            errors: rlmLicenceType.getErrors('usage'),
+            required: true,
+            options: {locked: 'Node Locked', floating: 'Floating'}
+        }) }}
+
+    </div>
+{% endblock %}
+
+{% block details %}
+    <div id="settings" class="meta">
+        {{ forms.textField({
+            label: "Slug"|t('app'),
+            siteId: rlmLicenceType.siteId,
+            id: 'slug',
+            name: 'slug',
+            value: rlmLicenceType.slug,
+            placeholder: "Enter slug"|t('app'),
+            errors: (rlmLicenceType.getErrors('slug')|merge(rlmLicenceType.getErrors('uri')))
+        }) }}
+
+        {{ forms.lightswitchField({
+            label: "Enabled"|t('app'),
+            id: 'enabled',
+            name: 'enabled',
+            on: rlmLicenceType.enabled
+        }) }}
+    </div>
+    {% if rlmLicenceType.id %}
+        <div class="meta read-only">
+            <div class="data">
+                <h5 class="heading">{{ "Date Created"|t('app') }}</h5>
+                <div class="value">{{ rlmLicenceType.dateCreated|datetime('short') }}</div>
+            </div>
+            <div class="data">
+                <h5 class="heading">{{ "Date Updated"|t('app') }}</h5>
+                <div class="value">{{ rlmLicenceType.dateUpdated|datetime('short') }}</div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% if not rlmLicenceType.slug %}
+    {% js %}
+        window.slugGenerator = new Craft.SlugGenerator('#title', '#slug');
+    {% endjs %}
+{% endif %}

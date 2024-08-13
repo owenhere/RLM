@@ -1,0 +1,48 @@
+{% extends "_layout" %}
+
+{% set bodyColor = "greyBG" %}
+{% set transMenu = true %}
+
+{% block content %}
+
+<div class="grid-container top-pad-big">
+    <div class="grid-x center">
+        <h1>Login</h1>
+    </div>
+    <div class="grid-x center">
+        <div class="formContainer greyBG cell small-12 medium-6">
+            <form method="post" accept-charset="UTF-8">
+
+                {% include "includes/general/_redirects" %}
+
+                {{ csrfInput() }}
+                <input type="hidden" name="action" value="users/login">
+
+                <h3><label for="loginName">Email</label></h3>
+                <input id="loginName" type="text" name="loginName"
+                    value="{{ craft.app.user.rememberedUsername }}">
+
+                <h3><label for="password">Password</label></h3>
+                <input id="password" type="password" name="password">
+
+                <label>
+                    <input type="checkbox" name="rememberMe" value="1">
+                    Remember me
+                </label>
+
+                <input class="button" style="margin-top:14px;" type="submit" value="Login">
+
+                {% if errorMessage is defined %}
+                    <p><span class="form-error is-visible">{{ errorMessage }}</span></p>
+                {% endif %}
+            </form>
+
+            <p><a href="{{ url('forgotpassword') }}">Forget your password?</a></p>
+
+            Don't have an account?
+            {{ register.getLink() }}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

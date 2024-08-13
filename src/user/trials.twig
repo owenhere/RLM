@@ -1,0 +1,32 @@
+{% extends "_layout" %}
+{% block content %}
+    {% set products = craft.entries.section('productPages').all() %}
+
+    <div id="header">
+        <div class="grid-container">
+            <div class="grid-x">
+                <div class="cell small-12">
+                    <h1>My Trials</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grey">
+        <div class="grid-container top-pad">
+            <div class="grid-x">
+                <div class="cell small-12">
+
+                    {% for product in products %}
+                        {% if product.rlmLicenceType %}
+                            <p>
+                                <strong>{{ product.title }}</strong>
+                                {{ craft.rlm.getTrialLicence(product.rlmLicenceType) }}
+                            </p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

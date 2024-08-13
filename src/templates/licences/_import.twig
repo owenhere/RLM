@@ -1,0 +1,36 @@
+{% extends 'rlm/_layouts/cp' %}
+{% import "_includes/forms" as forms %}
+
+{% set title = 'RLM Licence Manager - Import Licences'|t %}
+
+{% set licenceTypes = craft.rlm.getLicenceTypeOptions() %}
+
+{% block content %}
+    {% if licenceTypes|length %}
+    <form class="field toolbar" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="rlm/cp/import">
+        {{ redirectInput('rlm/licences') }}
+        {{ csrfInput() }}
+        {{ forms.selectField({
+            label:          'Licence Type'|t,
+            id:             'licenceTypeId',
+            name:           'licenceTypeId',
+            options:        licenceTypes
+        }) }}
+        {{ forms.textareaField({
+            label:          'Licence CSV'|t,
+            instructions:   'Copy the strings from the RLM server (one per line).'|t,
+            id:             'licenceCsv',
+            name:           'licenceCsv',
+            rows:           15
+        }) }}
+        <div class="buttons clearafter">
+            <button class="btn submit export-btn" name="submit">
+                {{ 'Import Licences'|t }}
+            </button>
+        </div>
+    </form>
+    {% else %}
+        <p>No licence types have been created yet.</p>
+    {% endif %}
+{% endblock %}

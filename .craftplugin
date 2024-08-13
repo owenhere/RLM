@@ -1,0 +1,28 @@
+{
+    "pluginName":"RLM Licence Manager",
+    "pluginDescription":"RLM Licence Manager",
+    "pluginVersion":"0.0.2",
+    "pluginAuthorName":"Coffee Bean Design",
+    "pluginVendorName":"Coffee Bean Design",
+    "pluginAuthorUrl":"coffeebean.design",
+    "pluginAuthorGithub":"",
+    "codeComments":"",
+    "pluginComponents": [
+        "controllers",
+        "cpsection",
+        "elements",
+        "fieldtypes",
+        "models",
+        "services",
+        "variables"
+    ],
+    "consolecommandName":"",
+    "controllerName":"CpController",
+    "elementName":["RlmLicence","RlmLicenceType"],
+    "fieldName":["RlmLicence", "RlmLicenceType"],
+    "modelName":"",
+    "recordName":["RlmLicence", "RlmLicenceType"],
+    "serviceName":"RlmLicenceService",
+    "apiVersion":
+    "api_version_3_0"
+}

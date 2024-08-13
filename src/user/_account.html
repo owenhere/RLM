@@ -1,0 +1,280 @@
+ {% extends "_layout" %}
+
+ {% set bodyColor = "greyBG" %}
+ {% set transMenu = true %}
+ {% set logoColor = 'logo-white' %}
+
+ {% block content %}
+
+ {% if currentUser %}
+
+ {% set products = craft.entries.section('productPages').all() %}
+
+    <div id="header" style="background-color: #23D5A9;">
+        <div class="grid-container">
+            <div class="grid-x">
+                <div class="cell small-12">
+                    <h1 style="text-shadow: none;">My Account</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="account" class="grid-container bottom-pad">
+        <div class="grid-x">
+            <div class="cell small-12">
+                <ul class="tabs center greyBG" data-deep-link="true" data-update-history="true" data-deep-link-smudge="true" data-deep-link-smudge-delay="500"
+                    data-tabs id="deeplinked-tabs">
+                    <li class="tabs-title center is-active"><a href="#details" aria-selected="true">My Details</a></li>
+                    <li class="tabs-title center"><a href="#products">My products</a></li>
+                    <li class="tabs-title center"><a href="#trials">My trials</a></li>
+                </ul>
+
+                <div class="tabs-content greyBG  top-pad" data-tabs-content="deeplinked-tabs">
+                    <div class="tabs-panel is-active" id="details">
+                        <form method="post" accept-charset="UTF-8" data-abide novalidate>
+                            {{ getCsrfInput() }}
+                            <input type="hidden" name="action" value="users/save-user">
+                            <input type="hidden" name="userId" value="{{ currentUser.id }}">
+
+                            <div class="grid-container">
+
+                            {% if not craft.app.config.general.useEmailAsUsername %}
+                            {% set error = currentUser.getFirstError('username')  %}
+                            {% set class = error ? 'has-error' : '' %}
+                            <div class="group {{  class }}">
+                                <label for="username">Username <span class="error-symbol">&#9888;</span></label>
+                                <p class="instruction">If left blank, this will become the email address.</p>
+
+                                <p class="error-message">{{ error }}</p>
+                                <input type="text" id="username" name="username" value="{{ currentUser.username }}">
+                            </div>
+                            {% endif %}
+
+                            {% set error = currentUser.getFirstError('email')  %}
+                            {% set class = error ? 'has-error' : '' %}
+                            <div class="group {{  class }}">
+                            <label for="email">Email <span class="error-symbol">&#9888;</span></label>
+
+                            {% if craft.app.projectConfig.get('users.requireEmailVerification') %}
+                                <p class="instruction">New email addresses need to be verified.</p>
+                            {% endif %}
+
+                            <p class="error-message">{{ error }}</p>
+                            <input type="text" id="email" name="email" value="{{ currentUser.email }}">
+                            </div>
+                                <div class="grid-x grid-padding-x">
+                                    <div class="medium-6 cell">
+                                        {% include "includes/user/_firstName" %}
+                                    </div>
+                                    <div class="medium-6 cell">
+                                        {% include "includes/user/_lastName" %}
+                                    </div>
+                                </div>
+
+                                <div class="grid-x grid-padding-x">
+                                    <div class="medium-6 cell">
+                                        {% include "includes/user/_country" %}
+                                    </div>
+                                    <div class="medium-6 cell">
+                                        {% include "includes/user/_company" %}
+                                    </div>
+                                </div>
+
+                                <div class="grid-x grid-padding-x">
+                                    <div class="medium-6 cell">
+                                        {% include "includes/user/_referral" %}
+                                    </div>
+                                    <div class="medium-6 cell">
+                                        <fieldset>
+                                            {% include "includes/user/_companySize" %}
+                                        </fieldset>
+                                    </div>
+                                </div>
+
+                                <div class="grid-x grid-padding-x top-pad">
+                                    <div class="medium-6 cell">
+                                        <fieldset>
+                                            {% include "includes/user/_application" %}
+                                        </fieldset>
+                                    </div>
+                                    <div class="medium-6 cell">
+                                        <fieldset>
+                                            {% include "includes/user/_industry" %}
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="submit" class="button" value="Update details">
+                        </form>
+                    </div>
+
+                    <div class="tabs-panel" id="products">
+
+                        {% set orders = craft.enupalStripe.getAllOrders() %}
+
+                        {#
+                            Example form developer:
+
+                            {% set orders = craft.enupalStripe.orders({email : currentUser.email}).all() %}
+
+                        #}
+
+                        {% set orders = craft.enupalStripe.orders().email(currentUser.email).all() %}
+                        <div class="grid-container">
+                            <div class="grid-x grid-margin-x grid-margin-y">
+                                {% if  orders is not empty %}
+                                    {% for order in orders %}
+                                        {% set paymentForm = order.getPaymentForm() %}
+
+                                        <div class="cell small-12 medium-6 large-4">
+                                            {% set subscription = order.getSubscription() %}
+                                            {% set formData = order.getFormFields() %}
+
+                                        <h4>{{ paymentForm.name }}</h4>
+                                        {# <strong>{{ order.dateOrdered|date }}</strong> #}
+
+                                        {% if subscription.status == 'active' and not subscription.cancelAtPeriodEnd %}
+                                            <small class="notif-grey">Renews on  {{ subscription.endDate|date }}</small>
+                                            {% else %}
+                                            <small class="notif-red">Maintenance cancelled</small>
+                                        {% endif %}
+                                        <hr>
+
+                                        Order id - {{ order.number }}
+
+                                        <div class="largeActivationDisplay">
+                                            <h4>Your activation key</h4>
+                                            <hr>
+                                            {{order.getFormFields['licence']}}
+                                        </div>
+                                            {% if subscription.status == 'active' and not subscription.cancelAtPeriodEnd %}
+                                                <form method="post">
+                                                    <input type="hidden" name="action" value="enupal-stripe/stripe/cancel-subscription">
+                                                    <input type="hidden" name="subscriptionId" value="{{ order.stripeTransactionId }}">
+                                                    <input type="hidden" name="cancelAtPeriodEnd" value="true">
+
+                                                    {{ csrfInput() }}
+
+                                                    <button type="submit" style="text-decoration: underline;">Cancel renewal</button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <h3>You haven't purchased anything yet</h3>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="tabs-panel" id="trials">
+
+                        {% set trials = currentUser.trials %}
+                        {# Janky, across the board we have to make sure any references to product are consistent, if a string it needs hyphenation #}
+
+                        <div class="grid-container">
+                            <div class="grid-x grid-margin-x center trials-boxes">
+                                {% if  trials is not empty %}
+                                    {% for trial in trials %}
+                                        {% if trial.selected |length %}
+                                            {% for product in products if product.title|kebab|lower == trial.value %}
+                                                    <div class="cell small-12 medium-6 large-4">
+
+                                                        <h3>{{ product.title }} trial</h3>
+                                                        <hr>
+
+                                                        {% if product.numberOfTrialLicensesToIssue > 1 %}
+
+                                                            {% set result = craft.rlm.getMultipleTrialLicence(product.rlmLicenceType, product.numberOfTrialLicensesToIssue) %} {# make trial number a this a var #}
+                                                            <div class="largeActivationDisplay">
+                                                               <h4>Your activation keys</h4>
+                                                                <hr>
+
+                                                                {% for item in result %}
+                                                                    {{ item }} <br>
+                                                                {% endfor %}
+                                                            </div>
+
+                                                        {% else %}
+
+                                                        <div class="largeActivationDisplay">
+
+
+                                                            <h4>Your activation key</h4>
+                                                            <hr>
+                                                            {{ craft.rlm.getTrialLicence(product.rlmLicenceType) }}
+
+                                                            {#
+
+                                                            {% set licBits = craft.rlm.getTrialExpiry(product.rlmLicenceType) %}
+
+                                                            {{date(licBits.date|date).diff( now ).days}}
+
+                                                            #}
+                                                        </div>
+
+                                                        {% endif %}
+
+                                                    </div>
+
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <h3>You haven't taken any product trials yet :'(</h3>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+
+<div class="grid-container top-pad-big">
+    <div class="grid-x center">
+        <h1>Login</h1>
+    </div>
+    <div class="grid-x center">
+        <div class="formContainer greyBG cell small-12 medium-6">
+            <form method="post" accept-charset="UTF-8">
+
+                {{ csrfInput() }}
+                {{ redirectInput('/account') }}
+                <input type="hidden" name="action" value="users/login">
+
+                <h3><label for="loginName">Email</label></h3>
+                <input id="loginName" type="text" name="loginName"
+                    value="{{ craft.app.user.rememberedUsername }}">
+
+                <h3><label for="password">Password</label></h3>
+                <input id="password" type="password" name="password">
+
+                <label>
+                    <input type="checkbox" name="rememberMe" value="1">
+                    Remember me
+                </label>
+
+                <input class="button" style="margin-top:14px;" type="submit" value="Login">
+
+                {% if errorMessage is defined %}
+                    <p><span class="form-error is-visible">{{ errorMessage }}</span></p>
+                {% endif %}
+            </form>
+
+            <p><a href="{{ url('forgotpassword') }}">Forget your password?</a></p>
+
+            Don't have an account?
+            {{ register.getLink() }}
+        </div>
+    </div>
+</div>
+
+ {% endif %}
+
+{% endblock %}

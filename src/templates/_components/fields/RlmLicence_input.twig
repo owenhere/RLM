@@ -1,0 +1,24 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * rlm plugin for Craft CMS 3.x
+ *
+ * Rlmlicencetype Field Input
+ *
+ * @author    Coffee Bean Design
+ * @copyright Copyright (c) 2018 Coffee Bean Design
+ * @link      coffeebean.design
+ * @package   Rlm
+ * @since     0.0.1
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{{ forms.textField({
+        label: 'Some Field',
+        instructions: 'Enter some text here.',
+        id: name,
+        name: name,
+        value: value})
+}}
